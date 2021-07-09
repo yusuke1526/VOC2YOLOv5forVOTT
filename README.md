@@ -36,3 +36,18 @@ mkdir yolo
 python voc2yolov5.py --source_dir path/to/source/directory --target_dir path/to/target/directory
 ```
 Then, YOLOv5 format dataset is in target directory, and data.yaml is in the current directory.
+
+4. Edit data.yaml
+add path, train, val, test (optional) information to data.yaml like below.
+```yaml
+path: data/mask  # dataset root dir
+train: train/images  # train images (relative to 'path')
+val: val/images  # val images (relative to 'path')
+# test: test/images
+
+# following lines written by voc2yolov5.py
+nc: 2
+names:
+- label0
+- label1
+```
