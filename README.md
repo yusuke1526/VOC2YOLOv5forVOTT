@@ -3,6 +3,8 @@
 voc2yolov5 converts Pascal VOC data format into YOLOv5 data format. \
 This program processes labels made using VOTT, otherwise it may not convert correctly.
 
+Original code: https://www.programmersought.com/article/94878508100/
+
 Source directory have to be in below style.
 ```bash
 .
