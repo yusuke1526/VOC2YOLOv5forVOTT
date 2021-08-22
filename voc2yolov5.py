@@ -3,6 +3,7 @@ import yaml
 import shutil
 import argparse
 import xml.etree.ElementTree as ET
+from sklearn.model_selection import train_test_split
 
 def xml_reader(filename):
     """ Parse a PASCAL VOC xml file """
@@ -58,12 +59,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--source_dir', type=str, required=True)
     parser.add_argument('--target_dir', type=str, required=True)
+    parser.add_argument('--train_size', type=int, default=7)
+    parser.add_argument('--val_size', type=int, default=2)
+    parser.add_argument('--test_size', type=int, default=1)
+    parser.add_argument('--shuffle', action='store_true')
     args = parser.parse_args()
 
     os.makedirs(f'{args.target_dir}/train/images', exist_ok=True)
     os.makedirs(f'{args.target_dir}/train/labels', exist_ok=True)
     os.makedirs(f'{args.target_dir}/val/images', exist_ok=True)
     os.makedirs(f'{args.target_dir}/val/labels', exist_ok=True)
+    os.makedirs(f'{args.target_dir}/test/images', exist_ok=True)
+    os.makedirs(f'{args.target_dir}/test/labels', exist_ok=True)
 
     class_names = []
     classes_dict = {}
@@ -86,20 +93,22 @@ if __name__ == "__main__":
             'names': class_names,
         }, f, sort_keys=False)
 
-    # train
-    train_img_name_list = []
-    with open(f"{args.source_dir}/ImageSets/Main/{class_names[0]}_train.txt") as f:
+    img_name_list = []
+    with open(f"{args.source_dir}/ImageSets/Main/{class_names[0]}.txt") as f:
         for line in f.readlines():
             file_name = line.strip().split(" ")[0]
-            train_img_name_list.append(file_name)
+            img_name_list.append(file_name)
+
+    img_name_list = sorted(img_name_list)
+
+    train_img_name_list, val_img_name_list = train_test_split(img_name_list, shuffle=args.shuffle, test_size=(args.val_size + args.test_size)/(args.train_size + args.val_size + args.test_size))
+    val_img_name_list, test_img_name_list = train_test_split(val_img_name_list, shuffle=args.shuffle, test_size=args.test_size/(args.val_size + args.test_size))
+
     for img_name in train_img_name_list:
         voc2yolo(img_name, "train")
 
-    # val
-    val_img_name_list = []
-    with open(f"{args.source_dir}/ImageSets/Main/{class_names[0]}_val.txt") as f:
-        for line in f.readlines():
-            file_name = line.strip().split(" ")[0]
-            val_img_name_list.append(file_name)
     for img_name in val_img_name_list:
         voc2yolo(img_name, "val")
+
+    for img_name in test_img_name_list:
+        voc2yolo(img_name, "test")
