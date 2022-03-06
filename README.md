@@ -40,6 +40,7 @@ python voc2yolov5.py --source_dir path/to/source/directory --target_dir path/to/
 Then, YOLOv5 format dataset and data.yaml are in target directory.
 
 4. Check data.yaml
+
 Add path, train, val, test (optional) information to data.yaml like below.
 ```yaml
 path: data/mask  # dataset root dir
